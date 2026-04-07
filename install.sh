@@ -5,7 +5,7 @@
 #
 # Панель: Nodes → Management → + → Copy docker-compose.yml → вставить в nano.
 #
-# Запуск только в интерактивной SSH-сессии (не через «голый» curl|bash без TTY).
+# Запуск только в интерактивной SSH-сессии. curl ... | bash даёт запуск без TTY — nano не откроется.
 #
 # Скачать с GitHub:
 #   curl -fsSL https://raw.githubusercontent.com/Shivarin/remnanode-installer/main/install.sh -o /root/install-remnanode.sh && chmod +x /root/install-remnanode.sh && sudo /root/install-remnanode.sh
@@ -45,7 +45,7 @@ if [[ ! -t 0 ]] || [[ ! -t 1 ]]; then
   echo ""
   echo ">>> Нет интерактивного терминала (TTY)."
   echo "    Скрипт открывает nano — зайди по SSH на сервер и выполни:"
-  echo "    curl -fsSL URL/install.sh -o /root/install-remnanode.sh && chmod +x /root/install-remnanode.sh && sudo /root/install-remnanode.sh"
+    echo "    curl -fsSL https://raw.githubusercontent.com/Shivarin/remnanode-installer/main/install.sh -o /root/install-remnanode.sh && chmod +x /root/install-remnanode.sh && sudo bash /root/install-remnanode.sh"
   echo ""
   exit 1
 fi

@@ -46,7 +46,7 @@ chmod +x /root/install-remnanode.sh
 sudo /root/install-remnanode.sh
 ```
 
-**Why not `curl ... | bash`:** piping removes an interactive TTY — **nano will not open**. The script is meant to be downloaded to a file first, then executed.
+**Why not `curl ... | bash`:** if you feed **`curl`** straight into **`bash`**, the script runs **without an interactive TTY** — **nano will not open**. Save the file first (`-o /root/install-remnanode.sh`), then run **`bash /root/install-remnanode.sh`** — that is intentional.
 
 ### What happens next (automatically)
 
@@ -90,7 +90,7 @@ cd /opt/remnanode && docker compose logs -f -t
 
 | Issue | What to do |
 |-------|------------|
-| Script says **no TTY** | Do not use a bare pipe without a terminal; SSH in and run the commands from step 2. |
+| Script says **no TTY** | Do not use `curl ... | bash` without a proper SSH terminal; SSH in and run the three commands from step 2. |
 | **nano** did not open | Ensure the SSH session is interactive (not all automation provides a PTY). |
 | Not **Ubuntu / Debian** (no `apt`) | Install Docker and `curl` manually per your distro docs, then run `sudo bash install.sh` again. |
 | **docker compose** error | Ensure the YAML from the panel was pasted in full, not truncated. |
