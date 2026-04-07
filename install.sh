@@ -1,31 +1,27 @@
 #!/usr/bin/env bash
-# Remnawave Node — установка одной командой (Docker + compose).
-# Документация: https://docs.rw/docs/install/remnawave-node/
+# Remnawave Node — Docker + nano: вставляешь docker-compose.yml из панели, сохраняешь — нода стартует.
+# https://docs.rw/docs/install/remnawave-node/
 #
-# В панели: Nodes → Management → + → скопируй NODE_PORT и SECRET_KEY из «Copy docker-compose».
+# Панель: Nodes → Management → + → Copy docker-compose.yml → вставить в nano.
 #
-# Примеры:
-#   curl -fsSL https://raw.githubusercontent.com/USER/remnanode-installer/main/install.sh | sudo bash -s -- -p 2222 -k 'YOUR_SECRET_KEY'
-#   sudo NODE_PORT=2222 SECRET_KEY='...' bash install.sh
+# Запуск только в интерактивной SSH-сессии (не через «голый» curl|bash без TTY).
 
 set -euo pipefail
 
 INSTALL_DIR="${INSTALL_DIR:-/opt/remnanode}"
-IMAGE="${IMAGE:-remnawave/node:latest}"
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
 
 usage() {
   sed 's/^    //' <<EOF
     Использование:
-      sudo bash install.sh --node-port PORT --secret-key KEY
-      sudo NODE_PORT=... SECRET_KEY=... bash install.sh
+      sudo bash install.sh              # поставит зависимости, откроет nano для вставки compose
+      sudo bash install.sh --help
 
-    Переменные окружения (альтернатива флагам):
-      NODE_PORT, SECRET_KEY, INSTALL_DIR, IMAGE
+    Переменные окружения:
+      INSTALL_DIR   каталог (по умолчанию /opt/remnanode)
+      COMPOSE_FILE  имя файла (по умолчанию docker-compose.yml)
 
-    Опции:
-      -p, --node-port   Порт API ноды (как в панели)
-      -k, --secret-key  SECRET_KEY из панели
-      -h, --help        Эта справка
+    Важно: открой nano, вставь YAML из панели, сохрани: Ctrl+O, Enter, выход: Ctrl+X.
 EOF
 }
 
@@ -34,28 +30,26 @@ if [[ "$(id -u)" -ne 0 ]]; then
   exit 1
 fi
 
-NODE_PORT="${NODE_PORT:-}"
-SECRET_KEY="${SECRET_KEY:-}"
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -p|--node-port) NODE_PORT="${2:-}"; shift 2 ;;
-    -k|--secret-key) SECRET_KEY="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Неизвестный аргумент: $1" >&2; usage; exit 1 ;;
   esac
 done
 
-if [[ -z "${NODE_PORT}" || -z "${SECRET_KEY}" ]]; then
-  echo "Ошибка: задай NODE_PORT и SECRET_KEY (панель → Nodes → Copy docker-compose)." >&2
-  usage
+if [[ ! -t 0 ]] || [[ ! -t 1 ]]; then
+  echo ""
+  echo ">>> Нет интерактивного терминала (TTY)."
+  echo "    Скрипт открывает nano — зайди по SSH на сервер и выполни:"
+  echo "    curl -fsSL URL/install.sh -o /root/install-remnanode.sh && chmod +x /root/install-remnanode.sh && sudo /root/install-remnanode.sh"
+  echo ""
   exit 1
 fi
 
 export DEBIAN_FRONTEND=noninteractive
 if command -v apt-get >/dev/null 2>&1; then
   apt-get update -qq
-  apt-get install -y -qq ca-certificates curl
+  apt-get install -y -qq nano ca-certificates curl
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -66,32 +60,32 @@ fi
 mkdir -p "${INSTALL_DIR}"
 cd "${INSTALL_DIR}"
 
-umask 077
-cat > .env <<ENVEOF
-NODE_PORT=${NODE_PORT}
-SECRET_KEY=${SECRET_KEY}
-ENVEOF
-chmod 600 .env
+if [[ ! -f "${COMPOSE_FILE}" ]]; then
+  : > "${COMPOSE_FILE}"
+fi
 
-cat > docker-compose.yml <<EOF
-services:
-  remnanode:
-    container_name: remnanode
-    hostname: remnanode
-    image: ${IMAGE}
-    restart: always
-    network_mode: host
-    env_file:
-      - .env
-EOF
+echo ""
+echo ">>> Сейчас откроется nano: вставь сюда целиком docker-compose.yml из панели (Copy docker-compose)."
+echo "    Сохранить: Ctrl+O, Enter  |  Выйти: Ctrl+X"
+echo ""
+read -r -p "Нажми Enter чтобы открыть nano..."
 
+nano "${COMPOSE_FILE}"
+
+if [[ ! -s "${COMPOSE_FILE}" ]]; then
+  echo "Файл ${INSTALL_DIR}/${COMPOSE_FILE} пустой — остановка." >&2
+  exit 1
+fi
+
+echo ""
 echo ">>> Каталог: ${INSTALL_DIR}"
 echo ">>> Запуск контейнера..."
-docker compose pull
-docker compose up -d
+docker compose -f "${COMPOSE_FILE}" pull
+docker compose -f "${COMPOSE_FILE}" up -d
 
 echo ""
-docker compose ps
+docker compose -f "${COMPOSE_FILE}" ps
 echo ""
-echo "Логи: cd ${INSTALL_DIR} && docker compose logs -f -t"
-echo "Открой NODE_PORT в файрволе только для IP панели (см. документацию Remnawave)."
+echo "Логи: cd ${INSTALL_DIR} && docker compose -f ${COMPOSE_FILE} logs -f -t"
+echo "В панели ноды: Next → Config Profile → Create."
+echo "Фаервол: NODE_PORT только для IP панели (см. https://docs.rw/docs/install/remnawave-node/)."
