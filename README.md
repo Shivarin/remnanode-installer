@@ -1,5 +1,7 @@
 # Установка Remnawave Node одной командой
 
+**Русский** · [English](README_EN.md)
+
 Скрипт автоматически ставит **Docker**, **nano** и зависимости, затем открывает редактор для вставки готового **`docker-compose.yml`** из панели [Remnawave](https://docs.rw/docs/install/remnawave-node/). После сохранения файла контейнер ноды запускается сам — руками собирать compose на сервере не нужно.
 
 **ОС: рассчитано на Ubuntu** (типичный VPS: Ubuntu 22.04 / 24.04 LTS). Та же логика подходит **Debian** и другим дистрибутивам с **`apt-get`**; на RHEL/Alpine/Arch без `apt` пакеты `nano`/`curl` и Docker нужно поставить вручную, затем запустить скрипт.
@@ -134,3 +136,4 @@ sudo env INSTALL_DIR=/srv/remnanode bash /root/install-remnanode.sh
 
 - [Remnawave Node — установка](https://docs.rw/docs/install/remnawave-node/)
 - Исходники скрипта: [github.com/Shivarin/remnanode-installer](https://github.com/Shivarin/remnanode-installer)
+- Та же инструкция на английском: [README_EN.md](README_EN.md)
