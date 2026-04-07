@@ -7,8 +7,10 @@
 1. В панели: **Nodes → Management → +** → заполни форму → **Copy docker-compose.yml**.
 2. На **чистом VPS** зайди по **SSH** (нужен обычный терминал, не «без TTY»).
 
+Скопируй целиком (это уже **твой** репозиторий [Shivarin/remnanode-installer](https://github.com/Shivarin/remnanode-installer)):
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh -o /root/install-remnanode.sh
+curl -fsSL https://raw.githubusercontent.com/Shivarin/remnanode-installer/main/install.sh -o /root/install-remnanode.sh
 chmod +x /root/install-remnanode.sh
 sudo /root/install-remnanode.sh
 ```
@@ -42,15 +44,12 @@ cd /opt/remnanode && docker compose logs -f -t
 | `INSTALL_DIR` | `/opt/remnanode` |
 | `COMPOSE_FILE` | `docker-compose.yml` |
 
-## Выложить репозиторий
+## Клонировать вместо curl
 
 ```bash
+git clone https://github.com/Shivarin/remnanode-installer.git
 cd remnanode-installer
-git add install.sh README.md .gitignore .gitattributes
-git commit -m "..."
-git remote add origin https://github.com/USER/remnanode-installer.git
-git branch -M main
-git push -u origin main
+sudo bash install.sh
 ```
 
 ## Безопасность

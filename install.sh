@@ -5,6 +5,9 @@
 # Панель: Nodes → Management → + → Copy docker-compose.yml → вставить в nano.
 #
 # Запуск только в интерактивной SSH-сессии (не через «голый» curl|bash без TTY).
+#
+# Скачать с GitHub:
+#   curl -fsSL https://raw.githubusercontent.com/Shivarin/remnanode-installer/main/install.sh -o /root/install-remnanode.sh && chmod +x /root/install-remnanode.sh && sudo /root/install-remnanode.sh
 
 set -euo pipefail
 
