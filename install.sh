@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Remnawave Node — Docker + nano: вставляешь docker-compose.yml из панели, сохраняешь — нода стартует.
+# ОС: ориентир Ubuntu / Debian (apt-get). На других дистрибутивах — Docker и curl вручную.
 # https://docs.rw/docs/install/remnawave-node/
 #
 # Панель: Nodes → Management → + → Copy docker-compose.yml → вставить в nano.
